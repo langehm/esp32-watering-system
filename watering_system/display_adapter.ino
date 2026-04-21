@@ -6,7 +6,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include <Wire.h>
-#include "Header.h" // Um NVSAdapter::isAnyPumpScheduledAt etc. abzufragen
+#include "header.h" // Um NVSAdapter::isAnyPumpScheduledAt etc. abzufragen
 
 namespace DisplayAdapter {
 

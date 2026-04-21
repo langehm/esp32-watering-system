@@ -9,7 +9,7 @@
 #include <Adafruit_GFX.h>
 #include <Adafruit_SSD1306.h>
 #include "driver/rtc_io.h"
-#include "Header.h" // WICHTIG: Hier stecken alle Adapter-Vordeklarationen drin!
+#include "header.h" // WICHTIG: Hier stecken alle Adapter-Vordeklarationen drin!
 
 const uint8_t PIN_SDA = 15;
 const uint8_t PIN_SCL = 16;
