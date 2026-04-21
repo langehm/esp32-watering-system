@@ -1,10 +1,12 @@
 name: Build and Release Firmware
 
-# Der Workflow startet nur, wenn du einen Git-Tag pushst, der mit "v" anfängt (z.B. v1.0.0)
 on:
   push:
     tags:
       - 'v*.*.*'
+
+permissions:
+  contents: write
 
 jobs:
   build-and-release:
@@ -14,11 +16,14 @@ jobs:
       - name: checkout repository
         uses: actions/checkout@v4
 
+      - name: Setup Arduino CLI
+        uses: arduino/setup-arduino-cli@v2
+
       - name: compile arduino sketch
-        uses: arduino/compile-action@v1
+        uses: arduino/compile-sketches@v1 
         with:
           fqbn: esp32:esp32:esp32s3
-          sketch-path: watering_system
+          sketch-paths: watering_system  
           platforms: |
             - name: esp32:esp32
               source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
@@ -34,8 +39,10 @@ jobs:
       - name: prepare release package
         run: |
           mkdir release_package
+          # Sucht die generierten .bin Dateien und kopiert sie
           find watering_system/build -name "*.bin" -exec cp {} release_package/ \;
           
+          # Erstellt die ZIP-Datei
           zip -j watering_system_firmware_${{ github.ref_name }}.zip release_package/*.bin
 
       - name: create github release
