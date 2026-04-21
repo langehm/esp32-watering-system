@@ -1,0 +1,45 @@
+name: Build and Release Firmware
+
+# Der Workflow startet nur, wenn du einen Git-Tag pushst, der mit "v" anfängt (z.B. v1.0.0)
+on:
+  push:
+    tags:
+      - 'v*.*.*'
+
+jobs:
+  build-and-release:
+    runs-on: ubuntu-latest
+
+    steps:
+      - name: checkout repository
+        uses: actions/checkout@v4
+
+      - name: compile arduino sketch
+        uses: arduino/compile-action@v1
+        with:
+          fqbn: esp32:esp32:esp32s3
+          sketch-path: watering_system
+          platforms: |
+            - name: esp32:esp32
+              source-url: https://raw.githubusercontent.com/espressif/arduino-esp32/gh-pages/package_esp32_index.json
+              
+          libraries: |
+            - name: Adafruit GFX Library
+            - name: Adafruit SSD1306
+            - name: RTClib
+            
+          cli-compile-flags: |
+            - --export-binaries
+
+      - name: prepare release package
+        run: |
+          mkdir release_package
+          find watering_system/build -name "*.bin" -exec cp {} release_package/ \;
+          
+          zip -j watering_system_firmware_${{ github.ref_name }}.zip release_package/*.bin
+
+      - name: create github release
+        uses: softprops/action-gh-release@v2
+        with:
+          files: watering_system_firmware_${{ github.ref_name }}.zip
+          generate_release_notes: true
